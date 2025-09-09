@@ -16,7 +16,7 @@ table can be updated any time your workflows change.
 ```bash
 go install github.com/droctothorpe/ghadoc@latest
 ```
-### Usage
+## Usage
 
 ```bash
 ghadoc generate -w example/workflows -o example/workflows.md
