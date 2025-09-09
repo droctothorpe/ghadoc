@@ -49,3 +49,9 @@ repos:
     hooks:
       - id: gha-docs
 ```
+
+## Populate descriptions
+
+At the top of each GitHub workflow file, add one or more comment lines that begin with
+`##`. These will be extracted to populate the `Description` column of the
+markdown table.
