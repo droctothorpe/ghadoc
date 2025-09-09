@@ -30,7 +30,7 @@ Update your `.pre-commit-config.yaml` file to include the following:
 ```yaml
 repos:
   - repo: https://github.com/droctothorpe/ghadoc
-    rev: 147a3312ae3d8e1baafa466c8f88153dfd3b0a6b
+    rev: 3d45eedd95fe9a417f03b58ea350fe6d90d6c3bf
     hooks:
       - id: ghadoc
 ```
