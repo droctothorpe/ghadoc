@@ -1,5 +1,5 @@
 ## Run end-to-end tests against the backend.
-## Validating a multi-line description.
+
 name: End-to-end tests
 
 on:

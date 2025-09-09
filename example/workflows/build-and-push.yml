@@ -1,4 +1,5 @@
 ## Builds and pushes images to GitHub Container Registry.
+
 name: Build and Push images
 run-name: Build images
 on:

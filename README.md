@@ -6,7 +6,22 @@ GitHub Actions Documentation Generator (`gha-docs`) is a CLI and
 [pre-commit](https://pre-commit.com/) hook that automatically generates a
 markdown table summarizing the GitHub Action workflows of a repository.
 
-The resulting markdown looks like [this](example/workflows/_workflows.md).
+The resulting markdown tablelooks like this:
+
+---
+
+# GitHub Workflows Summary
+
+| Filename | Description | Triggers |
+| --- | --- | --- |
+| [add-ci-passed-label.yml](example/workflows/add-ci-passed-label.yml) | Adds the 'ci-passed' label to a pull request once the 'CI Check' workflow completes successfully. | workflow_run |
+| [api-server-tests.yml](example/workflows/api-server-tests.yml) | Runs integration tests against API. | pull_request, push, workflow_dispatch |
+| [backend-visualization.yml](example/workflows/backend-visualization.yml) | Runs unit tests against backend visualization server. | pull_request, push |
+| [build-and-push.yml](example/workflows/build-and-push.yml) | Builds and pushes images to GitHub Container Registry. | workflow_call, workflow_dispatch |
+| [e2e-tests.yml](example/workflows/e2e-tests.yml) | Runs end-to-end tests against the backend. | pull_request, push |
+| [unit-tests.yml](example/workflows/unit-tests.yml) | Runs unit tests against the backend. | pull_request, push |
+
+---
 
 Ideally, `gha-docs` is incorporated into your pre-commit hooks so that the markdown
 table can be updated any time your workflows change.

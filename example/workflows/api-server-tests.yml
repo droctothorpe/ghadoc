@@ -1,4 +1,5 @@
 ## Runs integration tests against API.
+
 name: API Server Tests
 env:
   API_TESTS_DIR: "./backend/test/v2/api"

@@ -1,4 +1,5 @@
-## Runs unit tests against backend visualization server.
+## Runs unit tests against the backend visualization server.
+
 name: KFP backend visualization tests
 
 on:
