@@ -9,8 +9,9 @@ import (
 
 // generateCmd represents the generate command
 var generateCmd = &cobra.Command{
-	Use:   "generate",
-	Short: "Generate markdown documentation for GitHub Actions workflows",
+	Use:     "generate",
+	Aliases: []string{"gen"},
+	Short:   "Generate markdown documentation for GitHub Actions workflows",
 	Long: `Generate a markdown table summarizing GitHub Actions workflows in a specified directory.
 
 The table includes the following columns:
@@ -34,5 +35,6 @@ Output is written to workflows.md in the current directory.`,
 func init() {
 	generateCmd.Flags().StringP("workflows", "w", ".", "Directory containing GitHub workflow files")
 	generateCmd.Flags().StringP("output", "o", "./workflows.md", "Output file for the markdown table")
+	generateCmd.MarkFlagRequired("workflows")
 	rootCmd.AddCommand(generateCmd)
 }
