@@ -78,37 +78,25 @@ func parseWorkflowFile(filePath string) (WorkflowInfo, error) {
 	// Read the file line by line to find the description
 	scanner := bufio.NewScanner(file)
 	var descriptionLines []string
-	isFirstLine := true
-	foundDescription := false
 
-	for scanner.Scan() { // Continue until we find a non-## line after finding at least one ## line
+	for scanner.Scan() {
 		line := scanner.Text()
 		trimmedLine := strings.TrimSpace(line)
 
-		// Check if this is the first line
-		if isFirstLine {
-			isFirstLine = false
-			// If the first line doesn't start with ##, don't include any description
-			if !strings.HasPrefix(trimmedLine, "##") {
-				break
-			}
-			// First line starts with ##, extract the description
-			descriptionLine := strings.TrimSpace(strings.TrimPrefix(trimmedLine, "##"))
-			descriptionLines = append(descriptionLines, descriptionLine)
-			foundDescription = true
-		} else if strings.HasPrefix(trimmedLine, "##") {
-			// Extract the description by removing the ## prefix
-			descriptionLine := strings.TrimSpace(strings.TrimPrefix(trimmedLine, "##"))
-			descriptionLines = append(descriptionLines, descriptionLine)
-		} else if foundDescription {
-			// Stop parsing when we find a non-## line after finding at least one ## line
+		if !strings.HasPrefix(trimmedLine, "##") {
 			break
 		}
+
+		// Extract the description by removing the ## prefix
+		descriptionLine := strings.TrimSpace(strings.TrimPrefix(trimmedLine, "##"))
+		descriptionLines = append(descriptionLines, descriptionLine)
 	}
-	
+
 	// Join description lines with line breaks for markdown
 	if len(descriptionLines) > 0 {
 		workflow.Description = strings.Join(descriptionLines, "<br>")
+	} else {
+		workflow.Description = ""
 	}
 
 	// Parse YAML to check for "on" field with "push" and "pull_request"

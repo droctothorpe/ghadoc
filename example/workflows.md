@@ -6,5 +6,5 @@
 | [api-server-tests.yml](example/workflows/api-server-tests.yml) | Runs integration tests against API. | ✓ | ✓ |
 | [backend-visualization.yml](example/workflows/backend-visualization.yml) | Runs unit tests against backend visualization server. | ✓ | ✓ |
 | [build-and-push.yml](example/workflows/build-and-push.yml) | Builds and pushes images to GitHub Container Registry. |  |  |
-| [e2e-tests.yml](example/workflows/e2e-tests.yml) | Run end-to-end tests against the backend<br>Validating a multi-line description | ✓ | ✓ |
+| [e2e-tests.yml](example/workflows/e2e-tests.yml) | Run end-to-end tests against the backend.<br>Validating a multi-line description. | ✓ | ✓ |
 | [unit-tests.yml](example/workflows/unit-tests.yml) |  | ✓ | ✓ |
