@@ -1,6 +1,7 @@
 package generate
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -61,11 +62,10 @@ func TestParseWorkflowFile(t *testing.T) {
 
 	// Test cases
 	testCases := []struct {
-		name           string
-		content        string
-		expectedDesc   string
-		expectedOnPush bool
-		expectedOnPR   bool
+		name             string
+		content          string
+		expectedDesc     string
+		expectedTriggers []string
 	}{
 		{
 			name: "With description and both triggers",
@@ -78,9 +78,8 @@ on:
   pull_request:
     branches: [ main ]
 `,
-			expectedDesc:   "This is a test workflow",
-			expectedOnPush: true,
-			expectedOnPR:   true,
+			expectedDesc:     "This is a test workflow",
+			expectedTriggers: []string{"push", "pull_request"},
 		},
 		{
 			name: "With description and push only",
@@ -91,9 +90,8 @@ on:
   push:
     branches: [ main ]
 `,
-			expectedDesc:   "Another test workflow",
-			expectedOnPush: true,
-			expectedOnPR:   false,
+			expectedDesc:     "Another test workflow",
+			expectedTriggers: []string{"push"},
 		},
 		{
 			name: "With description and PR only",
@@ -104,9 +102,8 @@ on:
   pull_request:
     branches: [ main ]
 `,
-			expectedDesc:   "PR only workflow",
-			expectedOnPush: false,
-			expectedOnPR:   true,
+			expectedDesc:     "PR only workflow",
+			expectedTriggers: []string{"pull_request"},
 		},
 		{
 			name: "No description with both triggers",
@@ -118,9 +115,8 @@ on:
   pull_request:
     branches: [ main ]
 `,
-			expectedDesc:   "",
-			expectedOnPush: true,
-			expectedOnPR:   true,
+			expectedDesc:     "",
+			expectedTriggers: []string{"push", "pull_request"},
 		},
 		{
 			name: "With description and string triggers",
@@ -129,9 +125,8 @@ name: String Trigger
 
 on: push
 `,
-			expectedDesc:   "String trigger workflow",
-			expectedOnPush: true,
-			expectedOnPR:   false,
+			expectedDesc:     "String trigger workflow",
+			expectedTriggers: []string{"push"},
 		},
 		{
 			name: "With description and array triggers",
@@ -140,9 +135,8 @@ name: Array Trigger
 
 on: [push, pull_request]
 `,
-			expectedDesc:   "Array trigger workflow",
-			expectedOnPush: true,
-			expectedOnPR:   true,
+			expectedDesc:     "Array trigger workflow",
+			expectedTriggers: []string{"push", "pull_request"},
 		},
 	}
 
@@ -161,11 +155,35 @@ on: [push, pull_request]
 			if workflow.Description != tc.expectedDesc {
 				t.Errorf("Expected description %q, got %q", tc.expectedDesc, workflow.Description)
 			}
-			if workflow.OnPush != tc.expectedOnPush {
-				t.Errorf("Expected OnPush %v, got %v", tc.expectedOnPush, workflow.OnPush)
+
+			// Check that all expected triggers are present
+			if len(workflow.Triggers) != len(tc.expectedTriggers) {
+				t.Errorf("Expected %d triggers, got %d", len(tc.expectedTriggers), len(workflow.Triggers))
 			}
-			if workflow.OnPR != tc.expectedOnPR {
-				t.Errorf("Expected OnPR %v, got %v", tc.expectedOnPR, workflow.OnPR)
+
+			// Create maps for easier comparison
+			expectedMap := make(map[string]bool)
+			actualMap := make(map[string]bool)
+
+			for _, trigger := range tc.expectedTriggers {
+				expectedMap[trigger] = true
+			}
+
+			for _, trigger := range workflow.Triggers {
+				actualMap[trigger] = true
+			}
+
+			// Check for missing or unexpected triggers
+			for trigger := range expectedMap {
+				if !actualMap[trigger] {
+					t.Errorf("Expected trigger %q not found", trigger)
+				}
+			}
+
+			for trigger := range actualMap {
+				if !expectedMap[trigger] {
+					t.Errorf("Unexpected trigger %q found", trigger)
+				}
 			}
 		})
 	}
@@ -216,47 +234,45 @@ func TestGenerateMarkdownTable(t *testing.T) {
 		{
 			Filename:    "workflow1.yml",
 			Description: "Test workflow 1",
-			OnPush:      true,
-			OnPR:        true,
+			Triggers:    []string{"push", "pull_request"},
 		},
 		{
 			Filename:    "workflow2.yml",
 			Description: "Test workflow 2",
-			OnPush:      true,
-			OnPR:        false,
+			Triggers:    []string{"push"},
 		},
 		{
 			Filename:    "workflow3.yml",
 			Description: "Test workflow 3",
-			OnPush:      false,
-			OnPR:        true,
+			Triggers:    []string{"pull_request"},
 		},
 		{
 			Filename:    "workflow4.yml",
 			Description: "",
-			OnPush:      false,
-			OnPR:        false,
+			Triggers:    []string{},
 		},
 	}
 
 	// Generate markdown table
-	basePath := "test/workflows"
-	markdownTable := generateMarkdownTable(workflows, basePath)
+	workflowsPath := "test/workflows"
+	outputPath := "test/output.md"
+	markdownTable := generateMarkdownTable(workflows, workflowsPath, outputPath)
 
 	// Verify the table contains expected content
 	expectedLines := []string{
 		"# GitHub Workflows Summary",
-		"| Filename | Description | On Push | On PR |",
-		"| --- | --- | :---: | :---: |",
-		"| [workflow1.yml](test/workflows/workflow1.yml) | Test workflow 1 | ✓ | ✓ |",
-		"| [workflow2.yml](test/workflows/workflow2.yml) | Test workflow 2 | ✓ |  |",
-		"| [workflow3.yml](test/workflows/workflow3.yml) | Test workflow 3 |  | ✓ |",
-		"| [workflow4.yml](test/workflows/workflow4.yml) |  |  |  |",
+		"| Filename | Description | Triggers |",
+		"| --- | --- | --- |",
+		"| [workflow1.yml](workflows/workflow1.yml) | Test workflow 1 | push, pull_request |",
+		"| [workflow2.yml](workflows/workflow2.yml) | Test workflow 2 | push |",
+		"| [workflow3.yml](workflows/workflow3.yml) | Test workflow 3 | pull_request |",
+		"| [workflow4.yml](workflows/workflow4.yml) |  |  |",
 	}
 
 	for _, line := range expectedLines {
 		if !strings.Contains(markdownTable, line) {
 			t.Errorf("Expected markdown table to contain %q, but it doesn't", line)
+			fmt.Println("markdownTable:\n", markdownTable)
 		}
 	}
 }
@@ -322,16 +338,15 @@ on:
 	markdownContent := string(content)
 	expectedStrings := []string{
 		"# GitHub Workflows Summary",
-		"| Filename | Description | On Push | On PR |",
-		"workflow1.yml",
-		"Test workflow 1",
-		"workflow2.yml",
-		"Test workflow 2",
+		"| Filename | Description | Triggers |",
+		"| [workflow1.yml](workflows/workflow1.yml) | Test workflow 1 | push, pull_request |",
+		"| [workflow2.yml](workflows/workflow2.yml) | Test workflow 2 | push |",
 	}
 
 	for _, str := range expectedStrings {
 		if !strings.Contains(markdownContent, str) {
 			t.Errorf("Expected output to contain %q, but it doesn't", str)
+			fmt.Println("markdownTable:\n", string(content))
 		}
 	}
 
@@ -412,7 +427,7 @@ func TestEmptyWorkflowsDirectory(t *testing.T) {
 	if !strings.Contains(markdownContent, "# GitHub Workflows Summary") {
 		t.Error("Output should contain table title")
 	}
-	if !strings.Contains(markdownContent, "| Filename | Description | On Push | On PR |") {
+	if !strings.Contains(markdownContent, "| Filename | Description | Triggers |") {
 		t.Error("Output should contain table headers")
 	}
 
@@ -576,12 +591,33 @@ on:
 		t.Fatalf("parseWorkflowFile failed: %v", err)
 	}
 
-	// Check that push and pull_request are detected correctly
-	if !workflow.OnPush {
-		t.Error("Expected OnPush to be true for complex triggers")
+	// Check that all expected triggers are detected correctly
+	expectedTriggers := []string{"push", "pull_request", "workflow_dispatch"}
+
+	// Create maps for easier comparison
+	expectedMap := make(map[string]bool)
+	actualMap := make(map[string]bool)
+
+	for _, trigger := range expectedTriggers {
+		expectedMap[trigger] = true
 	}
-	if !workflow.OnPR {
-		t.Error("Expected OnPR to be true for complex triggers")
+
+	for _, trigger := range workflow.Triggers {
+		actualMap[trigger] = true
+	}
+
+	// Check for missing triggers
+	for trigger := range expectedMap {
+		if !actualMap[trigger] {
+			t.Errorf("Expected trigger %q not found in complex triggers", trigger)
+		}
+	}
+
+	// Check for unexpected triggers
+	for trigger := range actualMap {
+		if !expectedMap[trigger] {
+			t.Errorf("Unexpected trigger %q found in complex triggers", trigger)
+		}
 	}
 }
 

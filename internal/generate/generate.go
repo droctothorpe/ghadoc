@@ -14,8 +14,7 @@ import (
 type WorkflowInfo struct {
 	Filename    string
 	Description string
-	OnPush      bool
-	OnPR        bool
+	Triggers    []string // List of all triggers (e.g., push, pull_request, workflow_dispatch, etc.)
 }
 
 // Generate generates the workflows.md file from the workflow files in the
@@ -46,7 +45,7 @@ func Generate(workflowsDir string, output string) error {
 	}
 
 	// Generate markdown table
-	markdownTable := generateMarkdownTable(workflows, workflowsDir)
+	markdownTable := generateMarkdownTable(workflows, workflowsDir, output)
 
 	// Write to output file
 	err = os.WriteFile(output, []byte(markdownTable), 0644)
@@ -99,7 +98,7 @@ func parseWorkflowFile(filePath string) (WorkflowInfo, error) {
 		workflow.Description = ""
 	}
 
-	// Parse YAML to check for "on" field with "push" and "pull_request"
+	// Parse YAML to extract all triggers from the "on" field
 	var yamlData map[string]interface{}
 	err = yaml.Unmarshal(content, &yamlData)
 	if err != nil {
@@ -108,27 +107,23 @@ func parseWorkflowFile(filePath string) (WorkflowInfo, error) {
 
 	// Check if "on" field exists
 	if onField, ok := yamlData["on"]; ok {
-		// Check for push trigger
+		// Extract triggers based on the type of the "on" field
 		switch v := onField.(type) {
 		case map[string]interface{}:
-			_, workflow.OnPush = v["push"]
-			_, workflow.OnPR = v["pull_request"]
+			// If "on" is a map, each key is a trigger type
+			for key := range v {
+				workflow.Triggers = append(workflow.Triggers, key)
+			}
 		case []interface{}:
+			// If "on" is an array, each item is a trigger type
 			for _, item := range v {
-				if item == "push" {
-					workflow.OnPush = true
-				}
-				if item == "pull_request" {
-					workflow.OnPR = true
+				if str, ok := item.(string); ok {
+					workflow.Triggers = append(workflow.Triggers, str)
 				}
 			}
 		case string:
-			if v == "push" {
-				workflow.OnPush = true
-			}
-			if v == "pull_request" {
-				workflow.OnPR = true
-			}
+			// If "on" is a string, it's a single trigger type
+			workflow.Triggers = append(workflow.Triggers, v)
 		}
 	}
 
@@ -136,36 +131,40 @@ func parseWorkflowFile(filePath string) (WorkflowInfo, error) {
 }
 
 // generateMarkdownTable creates a markdown table from workflow information
-func generateMarkdownTable(workflows []WorkflowInfo, basePath string) string {
+func generateMarkdownTable(workflows []WorkflowInfo, workflowsDir string, outputPath string) string {
 	var sb strings.Builder
 
 	// Write table header
 	sb.WriteString("# GitHub Workflows Summary\n\n")
-	sb.WriteString("| Filename | Description | On Push | On PR |\n")
-	sb.WriteString("| --- | --- | :---: | :---: |\n")
+	sb.WriteString("| Filename | Description | Triggers |\n")
+	sb.WriteString("| --- | --- | --- |\n")
 
 	// Write table rows
 	for _, workflow := range workflows {
 		// Create relative link to the file
-		fileLink := fmt.Sprintf("[%s](%s)", workflow.Filename, workflow.Filename)
+		// Create link to workflow file with relative path from the markdown file
+		workflowFullPath := filepath.Join(workflowsDir, workflow.Filename)
+		outputDir := filepath.Dir(outputPath)
 
-		// Create checkmarks for triggers
-		pushCheck := ""
-		if workflow.OnPush {
-			pushCheck = "✓"
+		// Calculate relative path from output directory to workflow file
+		relativePath, err := filepath.Rel(outputDir, workflowFullPath)
+		if err != nil {
+			// Fallback to just the filename if there's an error
+			relativePath = workflow.Filename
 		}
 
-		prCheck := ""
-		if workflow.OnPR {
-			prCheck = "✓"
-		}
+		// Use forward slashes for URLs even on Windows
+		relativePath = filepath.ToSlash(relativePath)
+		fileLink := fmt.Sprintf("[%s](%s)", workflow.Filename, relativePath)
+
+		// Format triggers as a comma-separated list
+		triggers := strings.Join(workflow.Triggers, ", ")
 
 		// Write row
-		sb.WriteString(fmt.Sprintf("| %s | %s | %s | %s |\n",
+		sb.WriteString(fmt.Sprintf("| %s | %s | %s |\n",
 			fileLink,
 			workflow.Description,
-			pushCheck,
-			prCheck))
+			triggers))
 	}
 
 	return sb.String()

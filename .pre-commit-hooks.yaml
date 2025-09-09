@@ -5,4 +5,4 @@
   language: 'golang'
   pass_filenames: false
   files: .github/workflows
-  # exclude: .github/workflows/_workflows.md
+  exclude: .github/workflows/_workflows.md

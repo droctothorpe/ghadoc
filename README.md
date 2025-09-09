@@ -6,7 +6,7 @@ GitHub Actions Documentation Generator (`ghadoc`) is a CLI and
 [pre-commit](https://pre-commit.com/) hook that automatically generates a
 markdown table summarizing the GitHub Action workflows of a repository.
 
-The resulting markdown looks like [this](example/workflows.md).
+The resulting markdown looks like [this](example/workflows/_workflows.md).
 
 Ideally, `ghadoc` is incorporated into your pre-commit hooks so that the markdown
 table can be updated any time your workflows change.
