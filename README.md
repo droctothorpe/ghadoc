@@ -1,25 +1,25 @@
-# ghadoc
+# gha-docs
 
 ### 🐙 🐈‍⬛ 📖
 
-GitHub Actions Documentation Generator (`ghadoc`) is a CLI and
+GitHub Actions Documentation Generator (`gha-docs`) is a CLI and
 [pre-commit](https://pre-commit.com/) hook that automatically generates a
 markdown table summarizing the GitHub Action workflows of a repository.
 
 The resulting markdown looks like [this](example/workflows/_workflows.md).
 
-Ideally, `ghadoc` is incorporated into your pre-commit hooks so that the markdown
+Ideally, `gha-docs` is incorporated into your pre-commit hooks so that the markdown
 table can be updated any time your workflows change.
 
 ## Installation
 
 ```bash
-go install github.com/droctothorpe/ghadoc@latest
+go install github.com/droctothorpe/gha-doc@latest
 ```
 ## Usage
 
 ```bash
-ghadoc generate -w example/workflows -o example/workflows.md
+gha-docs generate -w example/workflows -o example/workflows.md
 ```
 
 
@@ -29,8 +29,8 @@ Update your `.pre-commit-config.yaml` file to include the following:
 
 ```yaml
 repos:
-  - repo: https://github.com/droctothorpe/ghadoc
+  - repo: https://github.com/droctothorpe/gha-docs
     rev: 3d45eedd95fe9a417f03b58ea350fe6d90d6c3bf
     hooks:
-      - id: ghadoc
+      - id: gha-docs
 ```

@@ -1,4 +1,4 @@
-module github.com/droctothorpe/ghadoc
+module github.com/droctothorpe/gha-docs
 
 go 1.23.1
 

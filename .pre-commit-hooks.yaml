@@ -1,7 +1,7 @@
-- id: ghadoc
-  name: ghadoc
+- id: gha-docs
+  name: gha-docs
   description: Generate documentation for GitHub Actions workflows.
-  entry: ghadoc generate -w .github/workflows -o .github/workflows/_workflows.md
+  entry: gha-docs generate -w .github/workflows -o .github/workflows/_workflows.md
   language: 'golang'
   pass_filenames: false
   files: .github/workflows

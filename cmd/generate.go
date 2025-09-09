@@ -3,7 +3,7 @@ package cmd
 import (
 	"fmt"
 
-	"github.com/droctothorpe/ghadoc/internal/generate"
+	"github.com/droctothorpe/gha-docs/internal/generate"
 	"github.com/spf13/cobra"
 )
 

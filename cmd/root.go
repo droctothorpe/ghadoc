@@ -8,9 +8,9 @@ import (
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
-	Use:   "ghadoc",
+	Use:   "gha-docs",
 	Short: "A tool for generating documentation for GitHub Actions workflows",
-	Long: `ghadoc is a command-line tool that parses GitHub Actions workflow files
+	Long: `gha-docs is a command-line tool that parses GitHub Actions workflow files
 and generates markdown documentation summarizing their key properties.
 
 Use the generate command to create a markdown table of all workflows in a directory.`,
@@ -33,5 +33,5 @@ func init() {
 	// Cobra supports persistent flags, which, if defined here,
 	// will be global for your application.
 
-	// rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.ghadoc.yaml)")
+	// rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.gha-docs.yaml)")
 }

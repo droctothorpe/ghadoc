@@ -38,7 +38,7 @@ func createWorkflowsDir(t *testing.T, workflows map[string]string) string {
 	t.Helper()
 
 	// Create base temp directory
-	tempDir := createTempDir(t, "ghadoc-test")
+	tempDir := createTempDir(t, "gha-docs-test")
 
 	// Create workflows directory
 	workflowsDir := filepath.Join(tempDir, "workflows")
@@ -280,7 +280,7 @@ func TestGenerateMarkdownTable(t *testing.T) {
 // TestGenerate tests the Generate function
 func TestGenerate(t *testing.T) {
 	// Create a temporary directory structure
-	tempDir := createTempDir(t, "ghadoc-test")
+	tempDir := createTempDir(t, "gha-docs-test")
 
 	// Create workflow directory
 	workflowsDir := filepath.Join(tempDir, "workflows")
@@ -339,7 +339,7 @@ on:
 	expectedStrings := []string{
 		"# GitHub Workflows Summary",
 		"| Filename | Description | Triggers |",
-		"| [workflow1.yml](workflows/workflow1.yml) | Test workflow 1 | push, pull_request |",
+		"| [workflow1.yml](workflows/workflow1.yml) | Test workflow 1 | pull_request, push |",
 		"| [workflow2.yml](workflows/workflow2.yml) | Test workflow 2 | push |",
 	}
 
