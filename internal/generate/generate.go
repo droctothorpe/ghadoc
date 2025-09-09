@@ -147,7 +147,8 @@ func generateMarkdownTable(workflows []WorkflowInfo, basePath string) string {
 	// Write table rows
 	for _, workflow := range workflows {
 		// Create relative link to the file
-		fileLink := fmt.Sprintf("[%s](%s)", workflow.Filename, filepath.Join(basePath, workflow.Filename))
+		filePath := filepath.Join(basePath, workflow.Filename)
+		fileLink := fmt.Sprintf("[%s](%s)", workflow.Filename, filePath)
 
 		// Create checkmarks for triggers
 		pushCheck := ""
