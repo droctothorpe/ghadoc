@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
 
 	"gopkg.in/yaml.v3"
@@ -126,6 +127,9 @@ func parseWorkflowFile(filePath string) (WorkflowInfo, error) {
 			workflow.Triggers = append(workflow.Triggers, v)
 		}
 	}
+
+	// Sort triggers alphabetically to ensure consistent ordering.
+	sort.Strings(workflow.Triggers)
 
 	return workflow, nil
 }
