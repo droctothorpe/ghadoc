@@ -4,9 +4,9 @@
 
 GitHub Actions Documentation Generator (`gha-docs`) is a CLI and
 [pre-commit](https://pre-commit.com/) hook that automatically generates a
-markdown table summarizing the GitHub Action workflows of a repository.
+markdown table summarizing the GitHub Actions workflows of a repository.
 
-The resulting markdown tablelooks like this:
+The resulting markdown table looks like this:
 
 ---
 
